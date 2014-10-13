@@ -140,6 +140,7 @@ CasperRenderer.prototype.render = function(with_xy) {
 
   for (var i=0; i < this.items.length; i++) {
     var item = this.items[i];
+    this.currentStep = i;
     if (item.type == etypes.Comment)
       this.space();
     
@@ -324,13 +325,15 @@ CasperRenderer.prototype.click = function(item) {
     } else {
       selector = '"' + item.info.selector + '"';
     }
-    this.stmt('casper.waitForSelector('+ selector + ',');
+    var stepVar =  'step' + this.currentStep;
+    this.stmt('var ' + stepVar + ' = '+ selector + ';');
+    this.stmt('casper.waitForSelector('+ stepVar + ',');
     this.stmt('    function success() {');
-    this.stmt('        test.assertExists('+ selector + ');');
-    this.stmt('        this.click('+ selector + ');');
+    this.stmt('        test.assertExists('+ stepVar + ');');
+    this.stmt('        this.click('+ stepVar + ');');
     this.stmt('    },');
     this.stmt('    function fail() {');
-    this.stmt('        test.assertExists(' + selector + ');')
+    this.stmt('        test.assertExists(' + stepVar + ');')
     this.stmt('});');
   }
 }
